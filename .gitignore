@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.spec
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Secrets / environment variables
+.env
+.env.*
+!.env.example
+
+# Flask session files
+flask_session/
+
+# Logs
+*.log
+logs/
+
+# Screenshots (commit only intentional ones)
+screenshots/*.png
+screenshots/*.jpg
+screenshots/*.gif
+!screenshots/.gitkeep

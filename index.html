@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LinguaFlow — AI Language Translator</title>
+
+  <!-- Google Fonts: Space Grotesk (display) + Inter (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+
+  <!-- Bootstrap 5 Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+
+<body>
+
+  <!-- ── Animated ambient blobs (CSS-driven) ── -->
+  <div class="blob blob-a" aria-hidden="true"></div>
+  <div class="blob blob-b" aria-hidden="true"></div>
+  <div class="blob blob-c" aria-hidden="true"></div>
+
+  <!-- ── Page wrapper ── -->
+  <div class="page-wrap">
+
+    <!-- ══ HEADER ══════════════════════════════════════════ -->
+    <header class="site-header">
+      <div class="brand">
+        <span class="brand-icon"><i class="bi bi-translate"></i></span>
+        <span class="brand-name">LinguaFlow</span>
+        <span class="brand-tag">AI Translator</span>
+      </div>
+      <p class="brand-sub">100+ languages · powered by Google Translate</p>
+    </header>
+
+    <!-- ══ MAIN CARD ════════════════════════════════════════ -->
+    <main class="card-translator" role="main">
+
+      <!-- ── Language bar ── -->
+      <div class="lang-bar">
+
+        <!-- Source language -->
+        <div class="lang-select-wrap">
+          <label for="source-lang" class="select-label">Translate from</label>
+          <div class="select-shell">
+            <select id="source-lang" name="source_lang" aria-label="Source language">
+              {% for code, name in languages.items() %}
+                <option value="{{ code }}"
+                  {% if code == 'auto' %}selected{% endif %}>
+                  {{ name }}
+                </option>
+              {% endfor %}
+            </select>
+            <i class="bi bi-chevron-down select-caret" aria-hidden="true"></i>
+          </div>
+        </div>
+
+        <!-- Swap button -->
+        <button id="swap-btn" class="btn-swap" title="Swap languages" aria-label="Swap source and target languages">
+          <i class="bi bi-arrow-left-right"></i>
+        </button>
+
+        <!-- Target language -->
+        <div class="lang-select-wrap">
+          <label for="target-lang" class="select-label">Translate to</label>
+          <div class="select-shell">
+            <select id="target-lang" name="target_lang" aria-label="Target language">
+              {% for code, name in languages.items() %}
+                {% if code != 'auto' %}
+                  <option value="{{ code }}"
+                    {% if code == 'es' %}selected{% endif %}>
+                    {{ name }}
+                  </option>
+                {% endif %}
+              {% endfor %}
+            </select>
+            <i class="bi bi-chevron-down select-caret" aria-hidden="true"></i>
+          </div>
+        </div>
+
+      </div><!-- /.lang-bar -->
+
+      <!-- ── Text panels ── -->
+      <div class="panels">
+
+        <!-- SOURCE panel -->
+        <div class="panel panel-source">
+          <div class="panel-header">
+            <span class="panel-label">Source text</span>
+            <span id="char-count" class="char-count">0 / 5000</span>
+          </div>
+          <textarea
+            id="source-text"
+            placeholder="Type or paste text here…"
+            maxlength="5000"
+            aria-label="Source text input"
+            spellcheck="true"
+          ></textarea>
+          <div class="panel-footer">
+            <button id="clear-btn" class="btn-ghost" title="Clear input" aria-label="Clear source text">
+              <i class="bi bi-x-circle"></i> Clear
+            </button>
+          </div>
+        </div>
+
+        <!-- DIVIDER / arrow -->
+        <div class="panel-divider" aria-hidden="true">
+          <span class="divider-icon"><i class="bi bi-arrow-right-short"></i></span>
+        </div>
+
+        <!-- OUTPUT panel -->
+        <div class="panel panel-output">
+          <div class="panel-header">
+            <span class="panel-label">Translation</span>
+            <!-- Loading spinner (hidden by default) -->
+            <span id="spinner" class="spinner" aria-live="polite" aria-label="Translating…" hidden>
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            </span>
+          </div>
+
+          <!-- Translated text rendered here -->
+          <div
+            id="translated-text"
+            class="output-box"
+            aria-live="polite"
+            aria-label="Translated text"
+            tabindex="0"
+          >
+            <span class="placeholder-msg">Your translation will appear here.</span>
+          </div>
+
+          <!-- Error message area -->
+          <div id="error-msg" class="error-msg" role="alert" hidden></div>
+
+          <div class="panel-footer output-footer">
+            <!-- Copy button -->
+            <button id="copy-btn" class="btn-ghost" title="Copy translation" aria-label="Copy translated text" disabled>
+              <i class="bi bi-clipboard"></i> Copy
+            </button>
+            <!-- Text-to-speech button -->
+            <button id="tts-btn" class="btn-ghost" title="Listen to translation" aria-label="Speak translated text" disabled>
+              <i class="bi bi-volume-up"></i> Listen
+            </button>
+          </div>
+        </div>
+
+      </div><!-- /.panels -->
+
+      <!-- ── Primary action ── -->
+      <div class="action-row">
+        <button id="translate-btn" class="btn-translate" aria-label="Translate text">
+          <i class="bi bi-translate"></i>
+          <span>Translate</span>
+        </button>
+      </div>
+
+    </main><!-- /.card-translator -->
+
+    <!-- ══ FOOTER ════════════════════════════════════════════ -->
+    <footer class="site-footer">
+      Built for <strong>CodeAlpha</strong> AI Internship &nbsp;·&nbsp;
+      Powered by <a href="https://pypi.org/project/deep-translator/" target="_blank" rel="noopener">deep-translator</a>
+    </footer>
+
+  </div><!-- /.page-wrap -->
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
